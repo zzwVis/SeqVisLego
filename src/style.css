@@ -1,0 +1,54 @@
+.grid-container {
+	display: grid;
+	grid-template-columns: repeat(13, 1fr);
+	grid-template-rows: repeat(10, 1fr);
+	gap: 10px;
+	height: 96.5vh;
+	background: #fafafa;
+	/*border: 6px solid #eeeeee;*/
+	padding: 10px;
+}
+
+
+.block1 {
+	grid-row: 1 / span 10;
+	grid-column: 1 / span 2;
+	/* b1 跨越第1-2列 */
+	position: relative;
+	padding: 20px;
+	background: white;
+	border-radius: 2px;
+	border: 2px solid #DCDCDC;
+}
+
+.block3 {
+	grid-row: 1 / span 3;
+	grid-column: 3 / span 11;
+	position: relative;
+	/*border: 2px solid #D3D3D3;*/
+	border-radius: 2px;
+	background: white;
+	border: 2px solid #DCDCDC;
+	z-index: 0;
+}
+
+.block4 {
+	grid-row: 4 / span 7;
+	/* b4 占据第2-6行 */
+	grid-column: 3 / span 11;
+	/* b4 占据第3-9列 */
+	position: relative;
+	/*border: 2px solid #DCDCDC;*/
+	/*border-radius: 5px;*/
+}
+
+.block5 {
+	grid-row: 8 / span 3;
+	/* b4 占据第2-6行 */
+	grid-column: 1 / span 2;
+	/* b4 占据第3-9列 */
+	position: relative;
+	border: 2px solid #DCDCDC;
+	border-radius: 2px;
+	overflow: auto;
+}

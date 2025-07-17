@@ -1,0 +1,39 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@antv/g2": "^4.0.7",
+    "@antv/g6": "^4.8.24",
+    "@element-plus/icons": "^0.0.11",
+    "@element-plus/icons-vue": "^2.3.1",
+    "axios": "^1.5.0",
+    "d3-array": "^3.2.4",
+    "d3-sankey": "^0.12.3",
+    "d3-scale": "^4.0.2",
+    "d3-shape": "^3.2.0",
+    "dagre-d3": "^0.6.4",
+    "echarts": "^5.4.3",
+    "element-plus": "^2.4.2",
+    "planck": "^1.0.0",
+    "sweetalert2": "^11.10.6",
+    "vue": "^3.3.4",
+    "vue-draggable-next": "^2.2.1",
+    "vuedraggable": "^2.24.3",
+    "vuex": "^4.0.2",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "d3": "^7.8.5",
+    "sass": "^1.72.0",
+    "vite": "^4.4.5"
+  }
+}
