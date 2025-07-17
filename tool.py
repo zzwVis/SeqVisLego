@@ -79,7 +79,7 @@ def generate_dict(n, string):
     return {str(i): string for i in range(1, n + 1)}
 
 
-def process_sankey_data(data, seq_view):
+def process_sankey_data(data, seq_view, view_type):
     nodes = []
     links = []
     # 遍历原始数据e
@@ -89,28 +89,34 @@ def process_sankey_data(data, seq_view):
         # 如果事件只有一个元素，直接添加节点
         if len(events) == 1:
             data_by_key = {}
-            # # 遍历所有的键
-            # for key in user_data.keys():
-            #     # 将每个键对应的值存储在字典中
-            #     if key == seq_view:
-            #         data_by_key[key] = user_data[key][0]
-            #     if key == timeKey:
-            #         timeValue = user_data[key][0]
-            # # 查找或添加节点
-            # source_node = next((node for node in nodes if node['name'] == events[0]),
-            #                    {'name': events[0], 'data': data_by_key, 'time': timeValue})
-            # target_node = next((node for node in nodes if node['name'] == 'unknown'),
-            #                    {'name': 'unknown', "data": {}, 'time': ""})
-            # nodes.append(source_node)
-            # nodes.append(target_node)
-            # links.append(
-            #     {'head': {'name': ''}, 'tail': {'name': ''}, 'source': source_node, 'target': target_node, 'value': 1})
+            if(view_type=="timeline"):
+                # 遍历所有的键
+                for key in user_data.keys():
+                    # 将每个键对应的值存储在字典中
+                    if key == seq_view:
+                        data_by_key[key] = user_data[key][0]
+                    # if key == timeKey:
+                    #     timeValue = user_data[key][0]
+                # 查找或添加节点
+                source_node = next((node for node in nodes if node['name'] == events[0]),
+                                   {'name': events[0], 'data': data_by_key, 'time': ""})
+                target_node = next((node for node in nodes if node['name'] == 'unknown'),
+                                   {'name': 'unknown', "data": {}, 'time': ""})
+                nodes.append(source_node)
+                nodes.append(target_node)
+                links.append(
+                    {'head': {'name': ''}, 'tail': {'name': ''}, 'source': source_node, 'target': target_node, 'value': 1})
 
         else:
             # 遍历事件，构建节点和链接
             for i in range(len(events) - 1):
                 source = events[i]
                 target = events[i + 1]
+
+                # 如果 source 是 " "，则跳过当前迭代
+                if source.split("@")[0] == " " or source.split("@")[0] == "No" or target.split("@")[0] == " " or target.split("@")[0] == "No":
+                    continue
+
                 # 初始化字典
                 source_data_by_key = {}
                 target_data_by_key = {}
@@ -192,7 +198,6 @@ def process_data(data):
 
 
 def process_agg_sankey_data(data):
-    # print("data",data)
     nodes = []
     links = []
     list_range = get_max_list_length(data)
@@ -411,44 +416,172 @@ def align_sequences_with_moves(sequences):
     return move_counts
 
 
-def get_event_pairs(data, start_time, end_time, event_set1, event_set2, seq_view, isPath):
+# def get_event_pairs(data, start_time, end_time, event_set1, event_set2, seq_view, isPath):
+#     filtered_events_by_user = {}
+#     for username in data.keys():
+#         time_key = None
+#         for key in data[username].keys():
+#             if "时间" in key or "time" in key:
+#                 time_key = key
+#                 break
+#             if "time_interval" in key:
+#                 time_key = key
+#                 break
+#
+#         # 对每个用户初始化一个空列表来存储事件对
+#         filtered_events_by_user[username] = []
+#         times = data[username][time_key]
+#         events = data[username][seq_view]
+#         for i in range(len(events)):
+#             for j in range(i + 1, len(events)):
+#                 # time_diff = (parse(times[j]).timestamp() - parse(times[i]).timestamp()) / 60  # 将时间差转换为分钟
+#                 if ":" in str(times[j]):
+#                     time_diff = (parse(times[j]).timestamp() - parse(times[i]).timestamp()) / 60
+#                 else:
+#                     # 如果是时间戳类型，则进行时间差计算
+#                     time_diff = (times[j] - times[i]) * 60  # 将时间差转换为分钟
+#
+#                 is_time_in_range = abs(time_diff) <= end_time
+#                 if is_time_in_range:
+#                     if len(event_set1) == 0 and len(event_set2) == 0:
+#                         # 如果没有指定事件类型，直接添加
+#                         filtered_events_by_user[username].append({'event1': i, 'event2': j})
+#                     elif (events[i] in event_set1 and events[j] in event_set2) or (
+#                             events[i] in event_set2 and events[j] in event_set1):
+#                         if (start_time >= 0) and (
+#                                 events[i] in event_set1 and events[j] in event_set2):
+#                             # 正时间范围：事件2 在事件1 之后
+#                             if isPath:
+#                                 filtered_events_by_user[username].append({'event1': i, 'event2': j})
+#                             else:
+#                                 eventPath = list(range(i, j + 1))
+#                                 filtered_events_by_user[username].append(eventPath)
+#                         elif start_time < 0:
+#                             # 负时间范围：事件2 在事件1 之前或之后都可
+#                             if isPath:
+#                                 filtered_events_by_user[username].append({'event1': i, 'event2': j})
+#                             else:
+#                                 eventPath = list(range(i, j + 1))
+#                                 filtered_events_by_user[username].append(eventPath)
+#     return filtered_events_by_user
+
+def get_event_pairs(data, start_time, end_time, event_set1, event_set2, attr1,attr2, isPath):
+    # 判断 start_time 和 end_time 是否为 None
+    hasTimeKey = start_time is not None and end_time is not None
+
     filtered_events_by_user = {}
     for username in data.keys():
         time_key = None
         for key in data[username].keys():
-            if "时间" in key or "time" in key:
+            if "时间" in key or "time" in key or "Time" in key:
+                time_key = key
+                break
+            if "time_interval" in key:
                 time_key = key
                 break
 
+        if attr1 == "":
+            attr1 = attr2
+        if attr2 == "":
+            attr2 = attr1
+
         # 对每个用户初始化一个空列表来存储事件对
         filtered_events_by_user[username] = []
-        times = data[username][time_key]
-        events = data[username][seq_view]
-        for i in range(len(events)):
-            for j in range(i + 1, len(events)):
-                time_diff = (parse(times[j]).timestamp() - parse(times[i]).timestamp()) / 60  # 将时间差转换为分钟
-                is_time_in_range = abs(time_diff) <= end_time
-                if is_time_in_range:
-                    if len(event_set1) == 0 and len(event_set2) == 0:
-                        # 如果没有指定事件类型，直接添加
-                        filtered_events_by_user[username].append({'event1': i, 'event2': j})
-                    elif (events[i] in event_set1 and events[j] in event_set2) or (
-                            events[i] in event_set2 and events[j] in event_set1):
-                        if (start_time >= 0) and (
-                                events[i] in event_set1 and events[j] in event_set2):
-                            # 正时间范围：事件2 在事件1 之后
-                            if isPath:
-                                filtered_events_by_user[username].append({'event1': i, 'event2': j})
-                            else:
-                                eventPath = list(range(i, j + 1))
-                                filtered_events_by_user[username].append(eventPath)
-                        elif start_time < 0:
-                            # 负时间范围：事件2 在事件1 之前或之后都可
-                            if isPath:
-                                filtered_events_by_user[username].append({'event1': i, 'event2': j})
-                            else:
-                                eventPath = list(range(i, j + 1))
-                                filtered_events_by_user[username].append(eventPath)
+
+        if len(event_set1) == 0:
+            event_set1 = data[username][attr1]
+        if len(event_set1) == 0:
+            event_set2 = data[username][attr2]
+
+
+        events1 = data[username][attr1]
+        events2 = data[username][attr2]
+
+        if hasTimeKey:
+            i = 0
+            while i < len(events1):
+                for j in range(i + 1, len(events2)):
+                    times = data[username][time_key]
+
+                    if times[i] is None or times[j] is None:
+                        continue
+
+                    if ":" in str(times[j]):
+                        time_diff = (parse(times[j]).timestamp() - parse(times[i]).timestamp()) / 60
+                    else:
+                        time_diff = (times[j] - times[i])
+
+                    is_time_in_range = abs(time_diff) <= end_time
+                    if is_time_in_range:
+                        if len(event_set1) == 0 and len(event_set2) == 0:
+                            filtered_events_by_user[username].append({'event1': i, 'event2': j})
+                            i = j  # ✅ 更新 i 到 j
+                            break
+                        elif (events1[i] in event_set1 and events2[j] in event_set2) or (
+                                events1[i] in event_set2 and events2[j] in event_set1):
+                            if (start_time >= 0) and (
+                                    events1[i] in event_set1 and events2[j] in event_set2):
+                                if isPath:
+                                    filtered_events_by_user[username].append({'event1': i, 'event2': j})
+                                else:
+                                    eventPath = list(range(i, j + 1))
+                                    filtered_events_by_user[username].append(eventPath)
+                                i = j  # ✅ 更新 i 到 j
+                                break
+                            elif start_time < 0:
+                                if isPath:
+                                    filtered_events_by_user[username].append({'event1': i, 'event2': j})
+                                else:
+                                    eventPath = list(range(i, j + 1))
+                                    filtered_events_by_user[username].append(eventPath)
+                                i = j  # ✅ 更新 i 到 j
+                                break
+                else:
+                    i += 1  # 如果没有匹配，i 继续累加
+
+        # if hasTimeKey:
+        #     for i in range(len(events1)):
+        #         for j in range(i + 1, len(events2)):
+        #             times = data[username][time_key]
+        #             # time_diff = (parse(times[j]).timestamp() - parse(times[i]).timestamp()) / 60  # 将时间差转换为分钟
+        #             if ":" in str(times[j]):
+        #                 time_diff = (parse(times[j]).timestamp() - parse(times[i]).timestamp()) / 60
+        #             else:
+        #                 # 如果是时间戳类型，则进行时间差计算
+        #                 time_diff = (times[j] - times[i])
+        #
+        #             is_time_in_range = abs(time_diff) <= end_time
+        #             if is_time_in_range:
+        #                 if len(event_set1) == 0 and len(event_set2) == 0:
+        #                     # 如果没有指定事件类型，直接添加
+        #                     filtered_events_by_user[username].append({'event1': i, 'event2': j})
+        #                 elif (events1[i] in event_set1 and events2[j] in event_set2) or (
+        #                         events1[i] in event_set2 and events2[j] in event_set1):
+        #                     if (start_time >= 0) and (
+        #                             events1[i] in event_set1 and events2[j] in event_set2):
+        #                         # 正时间范围：事件2 在事件1 之后
+        #                         if isPath:
+        #                             filtered_events_by_user[username].append({'event1': i, 'event2': j})
+        #                         else:
+        #                             eventPath = list(range(i, j + 1))
+        #                             filtered_events_by_user[username].append(eventPath)
+        #                     elif start_time < 0:
+        #                         # 负时间范围：事件2 在事件1 之前或之后都可
+        #                         if isPath:
+        #                             filtered_events_by_user[username].append({'event1': i, 'event2': j})
+        #                         else:
+        #                             eventPath = list(range(i, j + 1))
+        #                             filtered_events_by_user[username].append(eventPath)
+        else:
+            for i in range(len(events1)):
+                for j in range(i + 1, len(events2)):
+                    if events1[i] in event_set1 and events2[j] in event_set2:
+                        if isPath:
+                            filtered_events_by_user[username].append({'event1': i, 'event2': j})
+                        else:
+                            eventPath = list(range(i, j + 1))
+                            filtered_events_by_user[username].append(eventPath)
+                        break  # 添加这一行，找到满足条件的 j 后，跳出内层循环
     return filtered_events_by_user
 
 

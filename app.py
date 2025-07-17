@@ -28,6 +28,9 @@ CORS(app)
 local_vars = {}
 
 
+import traceback
+from flask import jsonify
+
 @app.route('/uploadFile', methods=['GET', 'POST'])
 def acceptFile():
     if request.method == 'POST':
@@ -39,24 +42,24 @@ def acceptFile():
         if filename.endswith(('.xlsx', '.xls')):
             try:
                 xls = pd.ExcelFile(file)
-                # 用于创建类的实例
                 set = {}
                 sheet_info = {}
                 for sheet_name in xls.sheet_names:
                     table = Table(file, sheet_name)
                     set[sheet_name] = ItemSet(table)
-                    # 创建字典来作为全局命名空间，并添加需要的变量
                     local_vars[sheet_name] = set[sheet_name]
-                    # 读取每个sheet
                     df = pd.read_excel(xls, sheet_name)
-                    # 获取每个sheet的表头
                     headers = df.columns.tolist()
                     sheet_info[sheet_name] = headers
                 return jsonify(sheet_info)
             except Exception as e:
-                return jsonify({'error': str(e)}), 500
+                # 捕获异常并返回详细的错误信息
+                error_message = f"Error processing file: {str(e)}\nTraceback:\n{traceback.format_exc()}"
+                return jsonify({'error': error_message}), 500
         else:
-            return jsonify({'error': 'Invalid request'}), 400
+            return jsonify({'error': 'Invalid file type. Only .xlsx and .xls are supported.'}), 400
+    else:
+        return jsonify({'error': 'Invalid request method. Only POST is supported.'}), 405
 
 
 @app.route('/executeCode', methods=['GET', 'POST'])
@@ -87,11 +90,22 @@ def acceptCode():
                     last_operation = "original"
                     code = extract_substring(code, ".view_type")
                     code += ".get_list_data()"
-            if any(keyword in last_operation for keyword in ['filter', 'intersection_set', 'difference_set']):
+            if any(keyword in last_operation for keyword in ['intersection_set', 'difference_set']):
                 code = code + ".get_list_data()"
-            elif any(keyword in last_operation for keyword in ['group_by', 'aggregate', 'flatten']):
+            if last_operation == "filter":
+                if "group" in operations:
+                    code = code + ".get_grouped_data()"
+                else:
+                    code = code + ".get_list_data()"
+            elif any(keyword in last_operation for keyword in ['group', 'aggregate', 'flatten', 'segment']):
                 code = code + ".get_grouped_data()"
             elif last_operation == "pattern":
+                code = code + ".get_result()"
+            elif last_operation == "align":
+                code = code + ".get_grouped_data()"
+            elif last_operation == "sum":
+                code = code + ".get_result()"
+            elif last_operation == "avg":
                 code = code + ".get_result()"
 
             # elif not any(
@@ -131,7 +145,7 @@ def get_sankey_data():
         seqView = data.get('seqView')
         # 调用数据处理函数获取桑基图数据
         originalData = add_hierarchy_info(data.get('data'), seqView)
-        sankey_data = process_sankey_data(originalData, seqView)
+        sankey_data = process_sankey_data(originalData, seqView, "sankey")
     # 返回 JSON 格式的数据
     return jsonify(sankey_data)
 
@@ -144,7 +158,7 @@ def get_timeline_data():
         seqView = data.get('seqView')
         # 调用数据处理函数获取桑基图数据
         originalData = add_hierarchy_info_timeline(data.get('data'), seqView)
-        sankey_data = process_sankey_data(originalData, seqView)
+        sankey_data = process_sankey_data(originalData, seqView, "timeline")
     # 返回 JSON 格式的数据
     return jsonify(sankey_data)
 
@@ -213,8 +227,9 @@ def event_pairs():
     end_time = requestData.get('endTime')
     event_set1 = requestData.get('eventSet1')
     event_set2 = requestData.get('eventSet2')
-    seq_view = requestData.get('seqView')
-    filtered_events_by_user = get_event_pairs(data, start_time, end_time, event_set1, event_set2, seq_view, True)
+    attr1 = requestData.get('attr1')
+    attr2 = requestData.get('attr2')
+    filtered_events_by_user = get_event_pairs(data, start_time, end_time, event_set1, event_set2, attr1,attr2, True)
     return jsonify({"filteredEvents": filtered_events_by_user})
 
 
@@ -228,8 +243,9 @@ def event_paths():
     end_time = requestData.get('endTime')
     event_set1 = requestData.get('eventSet1')
     event_set2 = requestData.get('eventSet2')
-    seq_view = requestData.get('seqView')
-    filtered_events_by_user = get_event_pairs(data, start_time, end_time, event_set1, event_set2, seq_view, False)
+    attr1 = requestData.get('attr1')
+    attr2 = requestData.get('attr2')
+    filtered_events_by_user = get_event_pairs(data, start_time, end_time, event_set1, event_set2, attr1,attr2, False)
     return jsonify({"filteredEvents": filtered_events_by_user})
 
 

@@ -36,7 +36,7 @@ class VisualGraph:
         return self.check_complex_rule(operations)
 
     def check_complex_rule(self, operations):
-        groupNum = operations.count("group_by")
+        groupNum = operations.count("group")
         flattenNum = operations.count("flatten")
         # 计算group_by和flatten的数量差
         diff = groupNum - flattenNum
@@ -44,22 +44,30 @@ class VisualGraph:
         # 检查是否以count/unique_count结束
         if operations[-1] == "count" or operations[-1] == "unique_count":
             if diff == 1:
-                return ["barChart", "pieChart"]
+                return ["bar chart", "pie chart",'table']
             elif diff > 1:
-                return ["sunBurst"]
+                return ["sunburst",'table']
         # 检查是否以unique_attr结束
         if operations[-1] == "unique_attr":
             return ["table"]
         # 检查是否以filter结束
         if operations[-1] == "filter":
-            return ["table"]
+            return ["table", "scatter", "timeline"]
+        if operations[-1] == "align":
+            return ["timeline","sankey"]
+        if operations[-1] == "sum":
+            return ["line chart"]
+        if operations[-1] == "avg":
+            return ["line chart"]
         if operations[-1] == "pattern":
-            return ['timeLine']
+            return ['timeline']
+        if operations[-1] == "segment":
+            return ['timeline',"sankey"]
         else:
             if groupNum > 1:
-                return ['timeLine', 'Sankey']
+                return ['timeline', 'sankey', 'line chart', 'heatmap','table']
             if groupNum == 1:
-                return ['timeLine', 'Sankey']
+                return ['timeline', 'sankey', 'line chart', 'heatmap','table']
         return None
 
     def find_paths_to_visualization(self, target_visualization):
@@ -77,7 +85,7 @@ class VisualGraph:
             return []  # 当前序列已满足目标
 
         # 尝试不同的操作来查找缺失的步骤
-        potential_operations = ["count", "unique_count", "group_by", "unique_attr", "filter", "flatten"]
+        potential_operations = ["count", "unique_count", "group", "unique_attr", "filter", "flatten"]
         for op in potential_operations:
             test_sequence = current_sequence + [op]
             # 检查静态定义的操作映射
@@ -96,26 +104,29 @@ op_graph = OperationGraph()
 vis_graph = VisualGraph()
 
 # 添加操作序列及其可能的下一步操作
-op_graph.add_operation([], ["filter", "group_by", "unique_attr", "unique_count"])
-op_graph.add_operation(["filter"], ["filter", "group_by", "unique_attr", "unique_count"])
-op_graph.add_operation(["group_by"], ["group_by", "unique_attr", "count", "unique_count", "flatten", "pattern"])
-op_graph.add_operation(["flatten"], ["group_by", "unique_attr", "count", "unique_count", "flatten", "pattern"])
+op_graph.add_operation([], ["filter", "unique_attr", "unique_count", "group"])
+op_graph.add_operation(["filter"], ["filter", "group", "unique_count","segment","pattern", "unique_attr","align"])
+op_graph.add_operation(["group"], ["group",  "filter", "unique_attr", "count", "flatten","unique_count", "pattern","align","sum","avg","segment"])
+op_graph.add_operation(["flatten"], ["group", "count", "unique_attr", "flatten", "pattern","unique_count","align","sum","avg"])
 op_graph.add_operation(["pattern"], ["count"])
 op_graph.add_operation(["unique_attr"], [])
 op_graph.add_operation(["count"], [])
 op_graph.add_operation(["unique_count"], [])
+op_graph.add_operation(["group","align"], ["filter","sum",'avg'])
 
 # 添加可视化序列及其可能的下一步可视化构型
 vis_graph.add_operation([], ["table"])
 vis_graph.add_operation(["filter"], ["table"])
 vis_graph.add_operation(["unique_attr"], ["table"])
-vis_graph.add_operation(["count"], ["barChart", "pieChart"])
-vis_graph.add_operation(["unique_count"], ["barChart", "pieChart"])
-vis_graph.add_operation(["filter", "unique_count"], ["barChart", "pieChart"])
+vis_graph.add_operation(["count"], ["bar chart", "pie chart", "table"])
+vis_graph.add_operation(["unique_count"], ["bar chart", "pie chart"])
+vis_graph.add_operation(["sum"], ["line chart"])
+vis_graph.add_operation(["avg"], ["line chart"])
+vis_graph.add_operation(["filter", "unique_count"], ["bar chart", "pie chart"])
 vis_graph.add_operation(["filter", "unique_attr"], ["table"])
 
 # 查找缺少的操作
-# print(vis_graph.get_missing_operations_for_visualization(['filter', 'group_by',"group_by", "pattern"], 'sunBurst'))  # 应该返回 ['count']
-# print(vis_graph.get_missing_operations_for_visualization(["group_by", "group_by", "flatten"], 'sunBurst'))
+# print(vis_graph.get_missing_operations_for_visualization(['filter', 'group',"group", "pattern"], 'sunBurst'))  # 应该返回 ['count']
+# print(vis_graph.get_missing_operations_for_visualization(["group", "group", "flatten"], 'sunBurst'))
 # print(vis_graph.get_visualization(["filter"]))
 # print(vis_graph.get_visualization(["filter","unique_count"]))
