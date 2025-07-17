@@ -1,6 +1,6 @@
-# 📊 SeqVisLego:  Modular Construction Analytics Framework for Understanding Event Sequences
+# 📊 SeqVisLego:  A Modular Construction Analytics Framework for Understanding Event Sequences
 
-**SeqVisLego** is an interactive system for visual analysis of event sequences. It includes both a **server-side** and a **client-side** component and is designed to be run locally on Windows with Python and Node.js environments.
+**SeqVisLego** is an interactive system for visual analysis of event sequences. It includes both a **server-side** and a **client-side** component and is designed to be run locally with Python and Node.js environments.
 
 ## ✅ Requirements
 
@@ -45,7 +45,6 @@ python app.py                # Run the Flask server
 cd front     # Go to the front-end folder
 npm install  # Install Node.js dependencies
 npm run dev  # Run the development server
-
 
 ### 4. Access the Application
 
