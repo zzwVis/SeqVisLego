@@ -41,6 +41,10 @@ class VisualGraph:
         # 计算group_by和flatten的数量差
         diff = groupNum - flattenNum
 
+        # 新增规则
+        if groupNum >= 1 and operations[-1] == "filter":
+            return ["table", "scatter", "timeline","sankey"]
+
         # 检查是否以count/unique_count结束
         if operations[-1] == "count" or operations[-1] == "unique_count":
             if diff == 1:
@@ -52,7 +56,7 @@ class VisualGraph:
             return ["table"]
         # 检查是否以filter结束
         if operations[-1] == "filter":
-            return ["table", "scatter", "timeline"]
+            return ["table", "scatter"]
         if operations[-1] == "align":
             return ["timeline","sankey"]
         if operations[-1] == "sum":
