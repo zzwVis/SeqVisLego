@@ -41,9 +41,17 @@ def extract_sequences(nested_dict):
 
 
 def is_subsequence(sub, full):
-    # 检查子序列是否存在
-    it = iter(full)
-    return all(item in it for item in sub)
+    n, m = len(sub),len(full)
+    if n==0:
+        return true
+
+    for i in range(m-n+1):
+        if full[i:i+n] == sub:
+            return True
+    return False
+    # # 检查子序列是否存在
+    # it = iter(full)
+    # return all(item in it for item in sub)
 
 
 def find_patterns_in_nested_data(nested_data, patterns):
