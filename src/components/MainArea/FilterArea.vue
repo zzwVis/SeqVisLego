@@ -17,50 +17,8 @@
 <!--      </el-button>-->
     </el-upload>
 
-<!--    要删掉-->
-<!--    <el-select v-model="selectedFileUrl" placeholder="选择文件" style="flex: 1; display: flex; justify-content: flex-end;margin-right: 10px">-->
-<!--      <el-option-->
-<!--          v-for="file in availableFiles"-->
-<!--          :key="file.name"-->
-<!--          :label="file.name"-->
-<!--          :value="file.url"-->
-<!--      ></el-option>-->
-<!--    </el-select>-->
-<!--    <el-button @click="handleFileSelection">加载文件</el-button>-->
 
   </div>
-<!--  <div class="tool" id="divBlock">-->
-<!--    <span class="module-title">Tool</span>-->
-<!--&lt;!&ndash;    <img src="../../assets/brush.svg" alt="Image"  class="tool-image" @click="brush"/>&ndash;&gt;-->
-<!--    <img src="../../assets/cancelBrush.svg" alt="Image"  class="tool-image" @click="cancelBrush"/>-->
-<!--&lt;!&ndash;    <img src="../../assets/cancelFilter.svg" alt="Image"  class="tool-image" @click="cancelFilter"/>&ndash;&gt;-->
-<!--&lt;!&ndash;    <img src="../../assets/reset.svg" alt="Image"  class="tool-image" @click="reset"/>&ndash;&gt;-->
-<!--  </div>-->
-  <!--    <span class="module-color">ColorMap</span>-->
-<!--    <div class="colorArea" id="divBlock">-->
-<!--      <span style="margin-left: 10px;top: 4%;color: black;">ColorMap</span>-->
-
-<!--      <el-select v-model="selected" placeholder="      Color By"-->
-<!--                 style="border: none;width: 60%;background:none;left: -5px;" class="custom-select"-->
-<!--                 size="small" @change="handleSelectChange">-->
-<!--        <el-option-->
-<!--            v-for="item in colorOptions"-->
-<!--            :key="item.value"-->
-<!--            :label="item.label"-->
-<!--            :value="item.value">-->
-<!--        </el-option>-->
-<!--      </el-select>-->
-<!--    </div>-->
-
-<!--  找事件对-->
-<!--  <div class="supportArea" id="divBlock">-->
-<!--    <span style="margin-left: 10px;top: 4%">Support</span>-->
-<!--    <div class="support-container">-->
-<!--      <input id="support-input" class="el-input" type="text" placeholder="" v-model="inputSupport">-->
-<!--      <el-button id="submit-button" @click="clickSupport">Min Support:</el-button>-->
-<!--      <span class="percent-label">%</span>-->
-<!--    </div>-->
-<!--  </div>-->
 
   <div class="paramArea" id="divBlock">
     <span style="margin-left: 10px;top: 4.5%;color: black">Parameter</span>
@@ -79,16 +37,6 @@
     </div>
 
     <span style="margin-left: -20px;top: 4%;color: black;">ColorMap:</span>
-<!--    <select v-model="selected"-->
-<!--            style="left: 5px; margin-right: 10px;background: none;font-size: 12px;color: black"-->
-<!--            class="custom-select"-->
-<!--            @change="handleSelectChange">-->
-<!--      <option v-for="item in colorOptions"-->
-<!--              :key="item.value"-->
-<!--              :value="item.value">-->
-<!--        {{ item.label }}-->
-<!--      </option>-->
-<!--    </select>-->
 
         <el-select v-model="selected" placeholder=" "
                style="left: 5px;margin-right: -10px"
@@ -103,107 +51,6 @@
     </el-select>
 
   </div>
-
-<!--  <div class="windowArea" id="divBlock">-->
-<!--    <span style="margin-left: 10px;top: 4%">Time Window</span>-->
-
-<!--    <check style="width: 15px;height: 15px;cursor: pointer;position: absolute;left:79%;padding: 2px"-->
-<!--           @click="analyseEvent" class="myImage"></check>-->
-<!--    <delete style="width: 15px;height: 15px;cursor: pointer;position: absolute;left:89%;padding: 3px"-->
-<!--            @click="clearEvent" class="myImage"></delete>-->
-<!--  </div>-->
-
-<!--    <div style="height: 17%;width: 94%;top: 37%;margin-top: 12px;position: absolute;left:0;background: white;border: none;padding: 10px">-->
-<!--      <span style="font-size: 2%;">Attribute:</span>-->
-<!--      <el-select-->
-<!--          v-model="selectedAttribute"-->
-<!--          placeholder="Attribute"-->
-<!--          style="width: 120px;margin-left: 10px;color: black"-->
-<!--      >-->
-<!--        <el-option-->
-<!--            v-for="item in optionAttr"-->
-<!--            :key="item.value"-->
-<!--            :label="item.label"-->
-<!--            :value="item.value"-->
-<!--        />-->
-<!--      </el-select>-->
-
-<!--      <div class="select-container" style="display: flex;position: relative;top: 8%">-->
-<!--        <span style="font-size: 2%;margin-top: 5px">Set:</span>-->
-<!--        <el-select-->
-<!--            v-model="selectedValues1"-->
-<!--            multiple-->
-<!--            collapse-tags-->
-<!--            placeholder="set 1"-->
-<!--            style="width: 180px;margin-left: 14px;"-->
-<!--        >-->
-<!--          <el-option-->
-<!--              v-for="item in option1"-->
-<!--              :key="item.value"-->
-<!--              :label="item.label"-->
-<!--              :value="item.value"-->
-<!--          />-->
-<!--        </el-select>-->
-
-<!--        <el-select-->
-<!--            v-model="selectedValues2"-->
-<!--            multiple-->
-<!--            collapse-tags-->
-<!--            placeholder="set 2"-->
-<!--            style="width: 180px;margin-left: 5px"-->
-<!--        >-->
-<!--          <el-option-->
-<!--              v-for="item in option2"-->
-<!--              :key="item.value"-->
-<!--              :label="item.label"-->
-<!--              :value="item.value"-->
-<!--          />-->
-<!--        </el-select>-->
-<!--      </div>-->
-
-<!--      &lt;!&ndash; 第一个内容块 &ndash;&gt;-->
-<!--      <div style="height: 100%;position: relative;top: 10%">-->
-<!--        <div class="content-block" style="margin-top: 0;">-->
-<!--          <span style="font-size: 2%;">Time Range:</span>-->
-<!--          <div style="margin-top: 6px">-->
-<!--            <div class="range-selector">-->
-<!--              &lt;!&ndash; 最小值输入 &ndash;&gt;-->
-<!--              <el-input-->
-<!--                  v-model.number="startNum"-->
-<!--                  type="number"-->
-<!--                  :min="min"-->
-<!--                  :max="max"-->
-<!--                  size="small"-->
-<!--                  @input="handleStartTimeChange"-->
-<!--                  style="width: 90px"-->
-<!--              ></el-input>-->
-<!--              <div style="color: black;margin-right: 14px">-</div>-->
-<!--              &lt;!&ndash; 最大值输入 &ndash;&gt;-->
-<!--              <el-input-->
-<!--                  v-model.number="endNum"-->
-<!--                  type="number"-->
-<!--                  :min="min"-->
-<!--                  :max="max"-->
-<!--                  size="small"-->
-<!--                  style="width: 90px"-->
-<!--              ></el-input>-->
-<!--              <el-select-->
-<!--                  v-model="selectedUnit"-->
-<!--                  placeholder="unit"-->
-<!--                  style="width: 125px; border: none;background: none;"-->
-<!--                  size="small">-->
-<!--                <el-option-->
-<!--                    v-for="item in units"-->
-<!--                    :key="item.value"-->
-<!--                    :label="item.label"-->
-<!--                    :value="item.value">-->
-<!--                </el-option>-->
-<!--              </el-select>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
 
   <div class="historyArea" id="divBlock">
     <span style="margin-left: 10px;top: 4%;color: black">Declarative Grammar</span>
@@ -632,7 +479,7 @@ export default {
       }
 
       // 前端可以直接把最后的操作传给后端 后面再改
-      axios.post('http://127.0.0.1:5000/executeCode', { code: expression, support: "50%" })
+      axios.post('http://127.0.0.1:5000/executeCode', { code: expression, support: "30%" })
           .then(response => {
             // 使用 Vuex action 更新 responseData
             this.$store.dispatch('saveResponseData', response.data);
